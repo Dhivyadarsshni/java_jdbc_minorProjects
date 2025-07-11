@@ -1,8 +1,6 @@
 package com.jdbc.java.minorProjects;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Scanner;
 
 public class StudentExamRecord {
@@ -59,6 +57,11 @@ public class StudentExamRecord {
             ps.setInt(5,scored_marks);
             ps.setInt(6,total_marks);
 
+            int rowsInserted = ps.executeUpdate();
+
+            if(rowsInserted>0) System.out.println("Datas inserted successfully");
+            else System.out.println("Error occured! Failed to insert data, please try again");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,6 +69,23 @@ public class StudentExamRecord {
     }
     //View Student function
     private static void viewStudent(Scanner sc) {
+        try(Connection conn = Conn_StudentExamRecord.getConnection()){
+            Statement smt = conn.createStatement();
+            ResultSet rs = smt.executeQuery("Select* from student");
+
+            System.out.println("\n--- Student Records ---");
+            while (rs.next()){
+                System.out.println("ID: "+rs.getString("id")
+                        + "\nName: "+rs.getString("name")
+                        +"\nDepartment: "+ rs.getString("dept")
+                        +"\nCompany: "+rs.getString("company_name")
+                        +"\nMarks scored: "+rs.getInt("scored_marks")
+                        +"\nTotal Marks: "+rs.getInt("total_marks")
+                );
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
     //Update Student function
