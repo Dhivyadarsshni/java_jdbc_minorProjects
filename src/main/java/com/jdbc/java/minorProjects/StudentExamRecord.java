@@ -175,9 +175,10 @@ public class StudentExamRecord {
     //View Student function
     private static void deleteStudent(Scanner sc){
         try(Connection conn = Conn_StudentExamRecord.getConnection()){
-
+            //flushing out extra lines
             sc.nextLine();
 
+            //checking if the id has existing data
             System.out.println("Enter the Student Id to delete:");
             String id = sc.nextLine();
 
@@ -192,6 +193,7 @@ public class StudentExamRecord {
                 return;
             }
 
+            //reconfirmation question
             System.out.println("Are you sure want to delete this record(yes/no)");
             String confirm = sc.nextLine();
 
