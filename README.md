@@ -22,4 +22,6 @@ Each folder in this repository represents a separate mini project. Common JDBC c
 ---
 
  🧠 Projects Included
-- Coming soon
+1 ) Student Records 
+
+_Made with 💛 by Dhivya Darsshni_
