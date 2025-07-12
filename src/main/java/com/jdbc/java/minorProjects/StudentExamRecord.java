@@ -10,7 +10,8 @@ public class StudentExamRecord {
         Scanner sc = new Scanner(System.in);
 
         while (true) {
-            System.out.println("Welcome to DD's University Student Record ");
+            System.out.println("------------------------------------------");
+            System.out.println("Welcome to DD's University Student Records ");
             System.out.println("Choose one of the following options: ");
             System.out.println("1. Add New Student");
             System.out.println("2. View a Student");
@@ -22,7 +23,7 @@ public class StudentExamRecord {
 
             switch (ch) {
                 case 1 -> addStudent(sc);
-                case 2 -> viewStudent(sc);
+                case 2 -> viewStudent();
                 case 3 -> updateStudent(sc);
                 case 4 -> deleteStudent(sc);
                 case 5 -> {
@@ -70,25 +71,31 @@ public class StudentExamRecord {
 
     }
     //View Student function
-    private static void viewStudent(Scanner sc) {
+    private static void viewStudent() {
         try(Connection conn = Conn_StudentExamRecord.getConnection()){
-            Statement smt = conn.createStatement();
-            ResultSet rs = smt.executeQuery("Select* from student");
 
-            System.out.println("\n--- Student Records ---");
-            while (rs.next()){
-                System.out.println("ID: "+rs.getString("id")
-                        + "\nName: "+rs.getString("name")
-                        +"\nDepartment: "+ rs.getString("dept")
-                        +"\nCompany: "+rs.getString("company_name")
-                        +"\nMarks scored: "+rs.getInt("scored_marks")
-                        +"\nTotal Marks: "+rs.getInt("total_marks")
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM STUDENT");
+
+            System.out.println("---------------------------------------------------------------------------------------------------------");
+            System.out.printf("| %-18s | %-15s | %-10s | %-20s | %-12s | %-11s |\n",
+                    "Register ID", "Name", "Department", "Company", "Scored Marks", "Total Marks");
+            System.out.println("---------------------------------------------------------------------------------------------------------");
+
+            // 🌟 Print each row of student data
+            while (rs.next()) {
+                System.out.printf("| %-18s | %-15s | %-10s | %-20s | %-12d | %-11d |\n",
+                        rs.getString("id"),
+                        rs.getString("name"),
+                        rs.getString("dept"),
+                        rs.getString("company_name"),
+                        rs.getInt("scored_marks"),
+                        rs.getInt("total_marks")
                 );
-            }
-        }catch (Exception e){
-            e.printStackTrace();
         }
-
+        }catch (Exception e){
+            e.getMessage();
+        }
     }
     //Update Student function
     private static void updateStudent(Scanner sc){
@@ -103,8 +110,6 @@ public class StudentExamRecord {
             ResultSet rs = checkstmt.executeQuery();
 
             if(!rs.next()){ System.out.println("Wrong id entered: "+id); return;}
-
-
 
             System.out.println("The fields given are\n1.Name\n2.Department\n3.Company\n4.Marks Scored\n5.Total Marks");
             System.out.println("In total how many fields do you want to update? ");
@@ -169,6 +174,45 @@ public class StudentExamRecord {
     }
     //View Student function
     private static void deleteStudent(Scanner sc){
+        try(Connection conn = Conn_StudentExamRecord.getConnection()){
 
+            sc.nextLine();
+
+            System.out.println("Enter the Student Id to delete:");
+            String id = sc.nextLine();
+
+            String checkId = "SELECT* FROM STUDENT WHERE id =?";
+            PreparedStatement checkqry = conn.prepareStatement(checkId);
+            checkqry.setString(1,id);
+
+            ResultSet rs = checkqry.executeQuery();
+
+            if(!rs.next()){
+                System.out.println("Entered wrong id "+id);
+                return;
+            }
+
+            System.out.println("Are you sure want to delete this record(yes/no)");
+            String confirm = sc.nextLine();
+
+            if(!confirm.equalsIgnoreCase("yes")||!confirm.equalsIgnoreCase("Yes")){
+                System.out.println("Deletion cancelled");
+                return;
+            }
+
+            String deleteQuery = "DELETE FROM STUDENT WHERE id =?";
+            PreparedStatement delstmt = conn.prepareStatement(deleteQuery);
+            delstmt.setString(1,id);
+
+            int checks = delstmt.executeUpdate();
+
+            if(checks>0) System.out.println("Student record with Id "+id+" deleted successfully");
+            else System.out.println("Something unexpected happened ");
+
+        }catch (SQLException sqle) {
+            System.out.println("❌ Database error: " + sqle.getMessage());
+        } catch (Exception e) {
+            System.out.println("⚠️ Unexpected error: " + e.getMessage());
+        }
     }
 }
